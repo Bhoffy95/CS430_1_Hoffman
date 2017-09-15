@@ -5,8 +5,9 @@
 
 
 typedef unsigned char RGBPixel[3];
+#define Size 256;
 
-typedef struct 
+
 void convertToP3 (FILE *fileFrom, FILE *fileTo);
 void convertToP6 (FILE *fileFrom, FILE *fileTo);
 
@@ -18,7 +19,7 @@ int main (int argc, char *argv[]){
   char *format;
   FILE * inFile;
   FILE * outFile;
-  char fh[256];
+  char bSize[256];
 
   if(strcmp(argv[1], "6")) format = "P6";
   else if(strcmp(argv[1], "3")) format = "P3";
@@ -47,4 +48,46 @@ int main (int argc, char *argv[]){
   (void) fclose(outFile);
   return EXIT_SUCCESS;
     
+}
+
+void convertToP6(FILE *inFile, FILE *outFile){
+  //creates a buffer to store the comments
+  char buffer[Size], *bSize;
+  int width;
+  int height;
+  unsigned int maxColorVal;
+
+  //get the "magic number" from the first byte in the stream
+  int charTemp;
+  charTemp = fgetc(inFile);
+  int[2] mNum = {charTemp, NULL};
+  charTemp=fgetc(inFile);
+  mNum[1] = charTemp;
+  fputc(mNum[0], outFile);
+  fputc(mNum[1], outFile);
+  fputc("\n", outFile);
+
+  //get the comments and transfer them using the buffer array.
+  while(strncmp(buffer, "#", 1) == 0){
+    bSize = fgets(buffer, Size, inFile);
+    if(srtncmp(buffer, "#", 1) == 0) fprintf(outFile, "%s", buffer);
+    printf("%s", buffer);
+    if(bSize == NULL) return;
+  }
+  
+  width = fgetc(inFile);
+  height = fgetc(inFile);
+
+  //allocate space based on the height and width
+  unsigned int *Pixmap;
+  Pixamp = (unsigned int *)malloc(width * height * sizeof(int));
+  //write the width and height values into the outFile
+  fprintf(outFile, "%d %d\n", width, height);
+  
+  maxColorVal = fgets(buffer, Size, inFile);
+  fprintf(outFile, "%d\n", maxColorVal);
+  
+
+  
+  
 }
